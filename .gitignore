@@ -1,0 +1,111 @@
+# ==================================================
+# 한국 부동산 데이터 집계 플랫폼 - Git Ignore
+# ==================================================
+
+# 의존성
+node_modules/
+.pnp
+.pnp.js
+
+# 테스트
+/coverage
+*.lcov
+
+# Next.js
+.next/
+out/
+build
+dist/
+.vercel
+.turbo
+
+# 프로덕션
+/build
+
+# 환경 변수
+.env
+.env*.local
+.env.production
+.env.development
+
+# 디버그
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# 로컬
+.DS_Store
+*.pem
+Thumbs.db
+
+# 에디터
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea
+*.swp
+*.swo
+*~
+
+# Prisma
+*.db
+*.db-journal
+
+# Docker
+*.log
+docker-compose.override.yml
+
+# 임시 파일
+*.tmp
+*.temp
+.cache
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
+
+# 빌드 산출물
+*.tsbuildinfo
+.eslintcache
+
+# 백업 파일
+*.bak
+*.backup
+*.old
+
+# 보안 관련
+*.key
+*.pem
+*.cert
+credentials.json
+secrets.json
+
+# 데이터베이스 덤프
+*.sql
+*.dump
+
+# Redis
+dump.rdb
+
+# 로그 파일
+logs/
+*.log
+
+# 업로드 파일
+uploads/
+temp/
+
+# 테스트 리포트
+test-results/
+playwright-report/
+
+# 문서 빌드
+docs/_build/
+docs/.doctrees/

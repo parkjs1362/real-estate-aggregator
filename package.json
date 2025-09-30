@@ -1,0 +1,55 @@
+{
+  "name": "real-estate-aggregator",
+  "version": "1.0.0",
+  "description": "한국 부동산 데이터 집계 플랫폼 - 실거래가와 매물 정보를 한 곳에서",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel",
+    "lint": "turbo run lint",
+    "type-check": "turbo run type-check",
+    "test": "turbo run test",
+    "test:e2e": "turbo run test:e2e",
+    "clean": "turbo run clean",
+    "db:migrate": "turbo run db:migrate",
+    "db:generate": "turbo run db:generate",
+    "db:studio": "turbo run db:studio",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "setup": "./scripts/setup.sh"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "turbo": "^1.11.0",
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "keywords": [
+    "real-estate",
+    "korea",
+    "apartment",
+    "price-data",
+    "부동산",
+    "실거래가",
+    "아파트",
+    "시세"
+  ],
+  "author": "Real Estate Platform Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/real-estate-aggregator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/real-estate-aggregator/issues"
+  },
+  "homepage": "https://github.com/your-username/real-estate-aggregator#readme"
+}

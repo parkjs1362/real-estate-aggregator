@@ -1,0 +1,45 @@
+MIT License
+
+Copyright (c) 2024 Real Estate Data Platform
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+IMPORTANT LEGAL NOTICE / 중요 법적 고지
+
+이 소프트웨어는 다음 데이터 소스들을 활용합니다:
+
+1. 공공 데이터
+   - 국토교통부 실거래가 공개 API
+   - 공공데이터포털(data.go.kr)의 오픈 데이터
+   출처: 반드시 명시되어야 하며, 이용약관을 준수해야 합니다.
+
+2. 제3자 사이트 데이터
+   - 각 사이트의 이용약관 및 저작권 정책을 반드시 확인하세요
+   - robots.txt 및 로봇 배제 표준을 준수하세요
+   - 상업적 이용 시 별도 허가가 필요할 수 있습니다
+
+3. 개인정보보호
+   - 개인정보보호법 준수
+   - 최소한의 개인정보만 수집
+   - 사용자 동의 필수
+
+본 소프트웨어의 사용으로 인한 법적 문제에 대해 개발자는 책임지지 않습니다.
+사용자는 모든 관련 법규와 이용약관을 준수할 책임이 있습니다.

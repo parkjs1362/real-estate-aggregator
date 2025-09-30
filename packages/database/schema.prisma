@@ -1,0 +1,368 @@
+// ===========================================
+// 한국 부동산 데이터 집계 플랫폼 스키마
+// 실거래가와 매물 정보 통합 관리
+// ===========================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 사용자 정보
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  favorites Favorite[]
+  alerts    Alert[]
+
+  @@map("users")
+}
+
+// 아파트 단지 마스터
+model Complex {
+  id           String  @id @default(cuid())
+  complexCode  String  @unique // 단지코드 (국토부 기준)
+  name         String  // 단지명
+  address      String  // 주소
+  roadAddress  String? // 도로명주소
+
+  // 지역 정보
+  sidoCode     String  // 시도코드
+  sidoName     String  // 시도명
+  gugunCode    String  // 구군코드
+  gugunName    String  // 구군명
+  dongCode     String  // 동코드
+  dongName     String  // 동명
+
+  // 단지 정보
+  buildYear    Int?    // 건축년도
+  totalCount   Int?    // 총 세대수
+  floorMax     Int?    // 최고층
+  floorMin     Int?    // 최저층
+
+  // 좌표 정보
+  latitude     Float?  // 위도
+  longitude    Float?  // 경도
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  unitTypes    UnitType[]
+  deals        Deal[]
+  listings     Listing[]
+  favorites    Favorite[]
+  priceSnapshots PriceSnapshot[]
+
+  @@index([sidoCode, gugunCode])
+  @@index([name])
+  @@index([address])
+  @@map("complexes")
+}
+
+// 타입별 정보 (평형별)
+model UnitType {
+  id              String  @id @default(cuid())
+  complexId       String
+  complex         Complex @relation(fields: [complexId], references: [id], onDelete: Cascade)
+
+  exclusiveArea   Float   // 전용면적 (㎡)
+  supplyArea      Float?  // 공급면적 (㎡)
+  roomCount       Int?    // 방 개수
+  bathCount       Int?    // 욕실 개수
+
+  // 평형 정보
+  pyeong          Float   // 평 단위 (전용면적 기준)
+  pyeongDisplay   String  // 표시용 평형 (예: "32평형")
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  deals           Deal[]
+  listings        Listing[]
+  priceSnapshots  PriceSnapshot[]
+
+  @@unique([complexId, exclusiveArea])
+  @@index([exclusiveArea])
+  @@index([pyeong])
+  @@map("unit_types")
+}
+
+// 실거래 데이터 (국토부 API)
+model Deal {
+  id            String    @id @default(cuid())
+  complexId     String
+  complex       Complex   @relation(fields: [complexId], references: [id], onDelete: Cascade)
+  unitTypeId    String
+  unitType      UnitType  @relation(fields: [unitTypeId], references: [id], onDelete: Cascade)
+
+  // 거래 정보
+  dealType      DealType  // 매매/전세/월세
+  dealDate      DateTime  // 거래일자
+  dealAmount    BigInt    // 거래금액 (원)
+  depositAmount BigInt?   // 보증금 (전세/월세)
+  monthlyRent   Int?      // 월세 (원)
+
+  // 위치 정보
+  dong          String?   // 동
+  floor         Int?      // 층
+
+  // 메타데이터
+  sourceType    SourceType @default(GOVERNMENT)
+  sourceId      String?   // 원본 데이터 ID
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([complexId, unitTypeId, dealDate, dealAmount, dong, floor])
+  @@index([dealDate])
+  @@index([dealType])
+  @@index([dealAmount])
+  @@map("deals")
+}
+
+// 현재 매물 정보
+model Listing {
+  id              String      @id @default(cuid())
+  complexId       String
+  complex         Complex     @relation(fields: [complexId], references: [id], onDelete: Cascade)
+  unitTypeId      String
+  unitType        UnitType    @relation(fields: [unitTypeId], references: [id], onDelete: Cascade)
+
+  // 매물 정보
+  listingType     ListingType // 매매/전세/월세
+  price           BigInt      // 매매가/보증금
+  monthlyRent     Int?        // 월세
+  deposit         BigInt?     // 전세보증금
+
+  // 위치 정보
+  dong            String?     // 동
+  floor           Int?        // 층
+  direction       String?     // 향
+
+  // 매물 상태
+  status          ListingStatus @default(ACTIVE)
+
+  // 중개업소 정보
+  agentName       String?     // 중개업소명
+  agentPhone      String?     // 연락처
+
+  // 등록 정보
+  registeredAt    DateTime    // 등록일자
+  expiresAt       DateTime?   // 만료일자
+
+  // 메타데이터
+  sourceType      SourceType
+  sourceId        String      // 원본 매물 ID
+  sourceUrl       String?     // 원본 URL
+  lastUpdatedAt   DateTime    @default(now())
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@unique([sourceType, sourceId])
+  @@index([listingType])
+  @@index([price])
+  @@index([status])
+  @@index([registeredAt])
+  @@map("listings")
+}
+
+// 사용자 즐겨찾기
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  complexId String
+  complex   Complex  @relation(fields: [complexId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, complexId])
+  @@map("favorites")
+}
+
+// 가격 변동 알림
+model Alert {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  complexId   String?   // 특정 단지 (null이면 전체)
+
+  // 알림 조건
+  alertType   AlertType
+  dealType    DealType?
+  priceMin    BigInt?   // 최소 가격
+  priceMax    BigInt?   // 최대 가격
+  areaMin     Float?    // 최소 면적
+  areaMax     Float?    // 최대 면적
+
+  // 알림 설정
+  isActive    Boolean   @default(true)
+  frequency   AlertFrequency @default(DAILY)
+  lastSentAt  DateTime?
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([isActive])
+  @@map("alerts")
+}
+
+// 가격 스냅샷 (일별 집계)
+model PriceSnapshot {
+  id            String   @id @default(cuid())
+  complexId     String
+  complex       Complex  @relation(fields: [complexId], references: [id], onDelete: Cascade)
+  unitTypeId    String?
+  unitType      UnitType? @relation(fields: [unitTypeId], references: [id], onDelete: Cascade)
+
+  // 기준일
+  snapshotDate  DateTime
+  dealType      DealType
+
+  // 통계 정보
+  avgPrice      BigInt?  // 평균 가격
+  minPrice      BigInt?  // 최저 가격
+  maxPrice      BigInt?  // 최고 가격
+  medianPrice   BigInt?  // 중간값
+  dealCount     Int      @default(0) // 거래 건수
+  listingCount  Int      @default(0) // 매물 건수
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([complexId, unitTypeId, snapshotDate, dealType])
+  @@index([snapshotDate])
+  @@index([dealType])
+  @@map("price_snapshots")
+}
+
+// 데이터 소스 관리
+model DataSource {
+  id          String     @id @default(cuid())
+  sourceType  SourceType
+  name        String     // 소스명
+  url         String?    // API URL
+  isActive    Boolean    @default(true)
+
+  // API 설정
+  rateLimit   Int?       // 초당 요청 수
+  headers     Json?      // 헤더 설정
+  params      Json?      // 기본 파라미터
+
+  // 상태 정보
+  lastSuccess DateTime?  // 마지막 성공
+  lastError   DateTime?  // 마지막 에러
+  errorCount  Int        @default(0)
+
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  jobLogs     JobLog[]
+
+  @@map("data_sources")
+}
+
+// 작업 로그
+model JobLog {
+  id           String      @id @default(cuid())
+  sourceId     String
+  source       DataSource  @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+
+  jobType      JobType
+  status       JobStatus
+
+  // 실행 정보
+  startedAt    DateTime
+  finishedAt   DateTime?
+  duration     Int?        // 실행 시간 (ms)
+
+  // 결과 정보
+  recordsProcessed Int      @default(0)
+  recordsInserted  Int      @default(0)
+  recordsUpdated   Int      @default(0)
+  recordsSkipped   Int      @default(0)
+
+  // 에러 정보
+  errorMessage String?
+  errorStack   String?
+
+  // 메타데이터
+  metadata     Json?
+
+  @@index([sourceId])
+  @@index([startedAt])
+  @@index([status])
+  @@map("job_logs")
+}
+
+// ===========================================
+// Enums
+// ===========================================
+
+enum DealType {
+  SALE     // 매매
+  JEONSE   // 전세
+  MONTHLY  // 월세
+}
+
+enum ListingType {
+  SALE     // 매매
+  JEONSE   // 전세
+  MONTHLY  // 월세
+}
+
+enum ListingStatus {
+  ACTIVE   // 활성
+  INACTIVE // 비활성
+  EXPIRED  // 만료
+  SOLD     // 거래완료
+}
+
+enum SourceType {
+  GOVERNMENT  // 정부 공공데이터
+  NAVER       // 네이버 부동산
+  ZIGBANG     // 직방
+  DABANG      // 다방
+  HOGANGNO    // 호갱노노
+  ASIL        // 아실
+  OTHER       // 기타
+}
+
+enum AlertType {
+  NEW_DEAL    // 신규 실거래
+  PRICE_DROP  // 가격 하락
+  PRICE_RISE  // 가격 상승
+  NEW_LISTING // 신규 매물
+}
+
+enum AlertFrequency {
+  IMMEDIATE   // 즉시
+  DAILY       // 일일
+  WEEKLY      // 주간
+}
+
+enum JobType {
+  DEAL_COLLECTION     // 실거래 수집
+  LISTING_COLLECTION  // 매물 수집
+  PRICE_CALCULATION   // 가격 계산
+  DATA_CLEANUP        // 데이터 정리
+}
+
+enum JobStatus {
+  PENDING     // 대기
+  RUNNING     // 실행중
+  COMPLETED   // 완료
+  FAILED      // 실패
+  CANCELLED   // 취소
+}
