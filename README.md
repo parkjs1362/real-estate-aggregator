@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🏠 한국 부동산 데이터 집계 플랫폼
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -276,3 +277,7 @@ GitHub Actions를 통한 자동 배포:
 ---
 
 **Made with ❤️ for Korean Real Estate Market**
+=======
+# real-estate-aggregator
+한국 부동산 데이터 집계 플랫폼 - 실거래가와 매물 정보를 한 곳에서
+>>>>>>> 8edf080c28347ae5e01fcb85920cb0cca86f4991
